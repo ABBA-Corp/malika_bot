@@ -1,0 +1,38 @@
+name: Production MalikaBot
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: GIT pulling from github repository
+      uses: appleboy/scp-action@master
+      env:
+        HOST: ${{ secrets.HOST }}
+        USERNAME: ${{ secrets.USERNAME }}
+        PORT: ${{ secrets.PORT }}
+        KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      with:
+        source: "."
+        target: "/home/Bot/malika_bot"
+
+    - name: Command using from script
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        USERNAME: ${{ secrets.USERNAME }}
+        PORT: ${{ secrets.PORT }}
+        KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        script_stop: true
+        script: |
+          /home/Bot/malika_bot/venv/bin/pip install -r /home/Bot/malika_bot/requirements.txt
+          systemctl restart malikabot.service
+          sh /home/devops/malika_bot.sh "${{ github.event.head_commit.message }}"
