@@ -38,6 +38,7 @@ month_btn.add(InlineKeyboardButton("4 oylik xarid", callback_data='4'))
 month_btn.add(InlineKeyboardButton("6 oylik xarid", callback_data='6'))
 month_btn.add(InlineKeyboardButton("8 oylik xarid", callback_data='8'))
 month_btn.add(InlineKeyboardButton("12 oylik xarid", callback_data='12'))
+month_btn.add(InlineKeyboardButton("Orqaga 🔙", callback_data="back"))
 
 conf_btn = InlineKeyboardMarkup(row_width=1)
 conf_btn.add(InlineKeyboardButton("Qabul qilaman ✅", callback_data="confirm"))
