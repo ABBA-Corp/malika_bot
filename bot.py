@@ -43,10 +43,10 @@ async def main():
     )
     config = load_config(".env")
 
-    sentry_sdk.init(
-        dsn=config.misc.sentry_dsn,
-        traces_sample_rate=1.0
-    )
+    # sentry_sdk.init(
+    #     dsn=config.misc.sentry_dsn,
+    #     traces_sample_rate=1.0
+    # )
 
     logger.info("Starting bot")
 
