@@ -6,6 +6,9 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.contrib.fsm_storage.redis import RedisStorage2
 
 from tgbot.config import load_config
+from tgbot.db.add_to_database import on_start_add_admin
+from tgbot.db.database import create_db
+from tgbot.db.db_cmds import get_admins
 from tgbot.filters.admin import AdminFilter
 from tgbot.handlers.admin import register_admin
 from tgbot.handlers.echo import register_echo
@@ -26,8 +29,8 @@ def register_all_filters(dp):
 def register_all_handlers(dp):
     register_admin(dp)
     register_user(dp)
-
-    register_echo(dp)
+    # debug
+    # register_echo(dp)
 
 
 async def main():
@@ -43,13 +46,16 @@ async def main():
     dp = Dispatcher(bot, storage=storage)
 
     bot['config'] = config
-
+    await create_db(bot)
+    await on_start_add_admin(config)
+    bot['admins'] = await get_admins()
     register_all_middlewares(dp, config)
     register_all_filters(dp)
     register_all_handlers(dp)
 
     # start
     try:
+        await dp.skip_updates()
         await dp.start_polling()
     finally:
         await dp.storage.close()
