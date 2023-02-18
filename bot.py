@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import sentry_sdk
 
 from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
@@ -10,6 +11,7 @@ from tgbot.db.add_to_database import on_start_add_admin
 from tgbot.db.database import create_db
 from tgbot.db.db_cmds import get_admins
 from tgbot.filters.admin import AdminFilter
+from tgbot.filters.back import BackFilter
 from tgbot.handlers.admin import register_admin
 from tgbot.handlers.echo import register_echo
 from tgbot.handlers.user import register_user
@@ -24,6 +26,7 @@ def register_all_middlewares(dp, config):
 
 def register_all_filters(dp):
     dp.filters_factory.bind(AdminFilter)
+    dp.filters_factory.bind(BackFilter)
 
 
 def register_all_handlers(dp):
@@ -35,11 +38,17 @@ def register_all_handlers(dp):
 
 async def main():
     logging.basicConfig(
-        level=logging.INFO,
+        level=logging.WARNING,
         format=u'%(filename)s:%(lineno)d #%(levelname)-8s [%(asctime)s] - %(name)s - %(message)s',
     )
-    logger.info("Starting bot")
     config = load_config(".env")
+
+    sentry_sdk.init(
+        dsn=config.misc.sentry_dsn,
+        traces_sample_rate=1.0
+    )
+
+    logger.info("Starting bot")
 
     storage = RedisStorage2() if config.tg_bot.use_redis else MemoryStorage()
     bot = Bot(token=config.tg_bot.token, parse_mode='HTML')

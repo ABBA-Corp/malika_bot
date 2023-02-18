@@ -2,6 +2,7 @@ from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, CallbackQuery
 
+from tgbot.filters.back import BackFilter
 from tgbot.keyboards.inline import model_btns, phone_btns, params_btns, month_btn, conf_btn
 from tgbot.keyboards.reply import contact_btn, remove_btn
 from tgbot.misc.states import UserGet
@@ -99,6 +100,12 @@ async def get_conf(c: CallbackQuery, state: FSMContext):
     await UserGet.get_name.set()
 
 
+async def back(c: CallbackQuery):
+    await c.message.delete()
+    await c.message.answer("Modellardan birini tanlang 👇", reply_markup=await model_btns())
+    await UserGet.get_model.set()
+
+
 def register_user(dp: Dispatcher):
     dp.register_message_handler(user_start, commands=["start"], state="*")
     dp.register_message_handler(get_name, state=UserGet.get_name)
@@ -106,8 +113,9 @@ def register_user(dp: Dispatcher):
     dp.register_message_handler(get_pass, content_types=types.ContentType.PHOTO, state=UserGet.get_pass)
     dp.register_message_handler(get_self, content_types=types.ContentType.PHOTO, state=UserGet.get_self)
     dp.register_message_handler(get_card, state=UserGet.get_card)
-    dp.register_callback_query_handler(get_model, state=UserGet.get_model)
-    dp.register_callback_query_handler(get_phone, state=UserGet.get_phone)
-    dp.register_callback_query_handler(get_color, state=UserGet.get_color)
-    dp.register_callback_query_handler(get_type, state=UserGet.get_type)
-    dp.register_callback_query_handler(get_conf, state=UserGet.get_conf)
+    dp.register_callback_query_handler(get_model, BackFilter(), state=UserGet.get_model)
+    dp.register_callback_query_handler(get_phone, BackFilter(), state=UserGet.get_phone)
+    dp.register_callback_query_handler(get_color, BackFilter(), state=UserGet.get_color)
+    dp.register_callback_query_handler(get_type, BackFilter(), state=UserGet.get_type)
+    dp.register_callback_query_handler(get_conf, BackFilter(), state=UserGet.get_conf)
+    dp.register_callback_query_handler(back, state="*")
