@@ -1,6 +1,6 @@
 from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message, CallbackQuery, InputFile
 
 from tgbot.filters.back import BackFilter
 from tgbot.keyboards.inline import model_btns, phone_btns, params_btns, month_btn, conf_btn
@@ -75,7 +75,9 @@ async def get_color(c: CallbackQuery, state: FSMContext):
 
 async def get_type(c: CallbackQuery, state: FSMContext):
     await state.update_data(month=c.data)
-    await c.message.edit_text("Iltimos soglasovanie ni qabul qiling", reply_markup=conf_btn)
+    await c.message.delete()
+    await c.message.answer_document(InputFile("Согласие.docx"), caption="Iltimos soglasovanieni qabul qiling 👆",
+                                    reply_markup=conf_btn)
     await UserGet.next()
 
 
@@ -92,7 +94,8 @@ async def get_conf(c: CallbackQuery, state: FSMContext):
                                                 f"📆 Muddati: {data['month']} oy\n")
     for i in config.tg_bot.channel_ids:
         await c.bot.send_media_group(chat_id=i, media=media)
-    await c.message.edit_text("Raxmat, so'rovingiz qabul qilindi!\n"
+    await c.message.delete()
+    await c.message.answer("Raxmat, so'rovingiz qabul qilindi!\n"
                               "Siz bilan tez orada agentimiz bog'lanadi. 👨‍💻\n"
                               "Tanlovingiz uchun raxmat. 😃\n"
                               "Yangi so'rov qoldirish uchun Ism Familya Sharifingizni yuboring!")
