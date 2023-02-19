@@ -42,6 +42,12 @@ async def get_self(m: Message, state: FSMContext):
 
 async def get_card(m: Message, state: FSMContext):
     await state.update_data(card=m.text)
+    await m.answer("Karta amal qilish muddatini kiriting")
+    await UserGet.next()
+
+
+async def get_time(m: Message, state: FSMContext):
+    await state.update_data(time=m.text)
     await m.answer("Modellardan birini tanlang 👇", reply_markup=await model_btns())
     await UserGet.next()
 
@@ -89,6 +95,7 @@ async def get_conf(c: CallbackQuery, state: FSMContext):
     media.attach_photo(data['self_id'], caption=f"👨 Ismi: {data['name']}\n"
                                                 f"📞 Telefon raqami: {data['number']}\n"
                                                 f"💳 Karta raqami: {data['card']}\n"
+                                                f"💳 Karta muddati: {data['time']}\n"
                                                 f"📱 Model: {data['model']}\n"
                                                 f"🎨 Rangi: {data['color']}\n"
                                                 f"📆 Muddati: {data['month']} oy\n")
@@ -115,6 +122,7 @@ def register_user(dp: Dispatcher):
     dp.register_message_handler(get_number, content_types=types.ContentType.CONTACT, state=UserGet.get_number)
     dp.register_message_handler(get_pass, content_types=types.ContentType.PHOTO, state=UserGet.get_pass)
     dp.register_message_handler(get_self, content_types=types.ContentType.PHOTO, state=UserGet.get_self)
+    dp.register_message_handler(get_time, state=UserGet.get_time)
     dp.register_message_handler(get_card, state=UserGet.get_card)
     dp.register_callback_query_handler(get_model, BackFilter(), state=UserGet.get_model)
     dp.register_callback_query_handler(get_phone, BackFilter(), state=UserGet.get_phone)

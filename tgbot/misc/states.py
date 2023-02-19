@@ -7,6 +7,7 @@ class UserGet(StatesGroup):
     get_pass = State()
     get_self = State()
     get_card = State()
+    get_time = State()
     get_model = State()
     get_phone = State()
     get_color = State()
