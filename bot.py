@@ -87,6 +87,6 @@ if __name__ == "__main__":
         async def startup_event():
             asyncio.create_task(main())
 
-        uvicorn.run(app, host="0.0.0.0", port=8000)
+        uvicorn.run(app, host="127.0.0.1", port=8090)
     except (KeyboardInterrupt, SystemExit):
         logger.error("Bot stopped!")
