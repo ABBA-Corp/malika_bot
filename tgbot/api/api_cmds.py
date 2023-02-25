@@ -74,7 +74,7 @@ async def create_app() -> FastAPI:
                 "status": order.status}
 
     @app.post("/api/v1/models/list")
-    async def list_models():
+    async def list_models(username: str = Depends(get_current_username)):
         models = await get_models()
         res = {"models": []}
         for i in models:
@@ -82,7 +82,7 @@ async def create_app() -> FastAPI:
         return res
 
     @app.post("/api/v1/phones/filter")
-    async def filter_phones(model: str):
+    async def filter_phones(model: str, username: str = Depends(get_current_username)):
         models = await get_phones(model)
         res = {"phones": []}
         for i in models:
@@ -100,7 +100,7 @@ async def create_app() -> FastAPI:
         return res
 
     @app.post("/api/v1/phones/list")
-    async def list_phones():
+    async def list_phones(username: str = Depends(get_current_username)):
         models = await get_list_phones()
         res = {"phones": []}
         for i in models:
