@@ -1,6 +1,6 @@
 from typing import List
 
-from tgbot.db.models import Phone, Admin
+from tgbot.db.models import Phone, Admin, Order
 
 
 async def get_models() -> List[Phone]:
@@ -15,6 +15,10 @@ async def get_params(name) -> List[Phone]:
     return await Phone.query.where(Phone.name == name).gino.first()
 
 
+async def get_list_phones() -> List[Phone]:
+    return await Phone.query.gino.all()
+
+
 async def get_admins() -> List:
     res = await Admin.query.gino.all()
     admins = []
@@ -23,7 +27,7 @@ async def get_admins() -> List:
     return admins
 
 
-async def add_admins(admin_id, m=None, typ=True):
+async def add_admins(admin_id, m=None, typ=True) -> bool:
     try:
         await Admin.create(tg_id=admin_id)
         if typ:
@@ -33,6 +37,25 @@ async def add_admins(admin_id, m=None, typ=True):
         if typ:
             await m.answer("Bu admin mavjud ❌")
             return False
+
+
+async def add_order(**kwargs) -> int:
+    new_order = await Order.create(name=kwargs["name"], number=kwargs["number"], passport=kwargs["passport"],
+                                   selfie=kwargs["selfie"], card=kwargs["card"], time=kwargs["time"],
+                                   model=kwargs["model"], phone=kwargs["phone"], color=kwargs["color"],
+                                   type=kwargs["type"], status=kwargs["status"])
+    return new_order.id
+
+
+async def update_order(**kwargs) -> int:
+    order = await Order.query.where(Order.id == kwargs["id"]).gino.first()
+    await order.update(status=kwargs["status"]).apply()
+    return order.id
+
+
+async def get_order(**kwargs) -> Order:
+    order = await Order.query.where(Order.id == kwargs["id"]).gino.first()
+    return order
 
 
 async def add_or_update(**kwargs) -> None:

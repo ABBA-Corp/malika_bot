@@ -32,6 +32,12 @@ async def params_btns(name, s):
     param_btn.add(InlineKeyboardButton("Orqaga 🔙", callback_data="back"))
     return param_btn
 
+
+async def admin_conf_btn(order_id):
+    btns = InlineKeyboardMarkup(row_width=1).add(InlineKeyboardButton('✅ Qabul qilish', callback_data=f"co{order_id}"),
+                                                 InlineKeyboardButton('❌ Bekor qilish', callback_data=f"ca{order_id}"),)
+    return btns
+
 month_btn = InlineKeyboardMarkup(row_width=1)
 month_btn.add(InlineKeyboardButton("3 oylik xarid", callback_data='3'))
 month_btn.add(InlineKeyboardButton("4 oylik xarid", callback_data='4'))
@@ -45,3 +51,4 @@ conf_btn.add(InlineKeyboardButton("Qabul qilaman ✅", callback_data="confirm"))
 conf_btn.add(InlineKeyboardButton("Orqaga 🔙", callback_data="back"))
 
 back_btn = InlineKeyboardMarkup().add(InlineKeyboardButton("Orqaga 🔙", callback_data="back"))
+

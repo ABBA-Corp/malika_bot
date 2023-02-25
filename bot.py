@@ -1,11 +1,13 @@
 import asyncio
 import logging
 import sentry_sdk
+import uvicorn
 
 from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.contrib.fsm_storage.redis import RedisStorage2
 
+from tgbot.api.api_cmds import create_app
 from tgbot.config import load_config
 from tgbot.db.add_to_database import on_start_add_admin
 from tgbot.db.database import create_db
@@ -37,16 +39,17 @@ def register_all_handlers(dp):
 
 
 async def main():
+
     logging.basicConfig(
-        level=logging.WARNING,
+        level=logging.INFO,
         format=u'%(filename)s:%(lineno)d #%(levelname)-8s [%(asctime)s] - %(name)s - %(message)s',
     )
     config = load_config(".env")
 
-    # sentry_sdk.init(
-    #     dsn=config.misc.sentry_dsn,
-    #     traces_sample_rate=1.0
-    # )
+    sentry_sdk.init(
+        dsn=config.misc.sentry_dsn,
+        traces_sample_rate=1.0
+    )
 
     logger.info("Starting bot")
 
@@ -58,11 +61,15 @@ async def main():
     await create_db(bot)
     await on_start_add_admin(config)
     bot['admins'] = await get_admins()
+
+    # create_app()
     register_all_middlewares(dp, config)
     register_all_filters(dp)
     register_all_handlers(dp)
 
+
     # start
+
     try:
         await dp.skip_updates()
         await dp.start_polling()
@@ -72,8 +79,14 @@ async def main():
         await bot.session.close()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
-        asyncio.run(main())
+        app = asyncio.run(create_app())
+
+        @app.on_event("startup")
+        async def startup_event():
+            asyncio.create_task(main())
+
+        uvicorn.run(app, host="0.0.0.0", port=8000)
     except (KeyboardInterrupt, SystemExit):
         logger.error("Bot stopped!")

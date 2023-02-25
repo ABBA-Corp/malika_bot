@@ -22,6 +22,9 @@ class TgBot:
 @dataclass
 class Miscellaneous:
     sentry_dsn: str
+    api_user: str
+    api_pass: str
+    front_url: str
 
 
 @dataclass
@@ -49,6 +52,9 @@ def load_config(path: str = None):
             database=env.str('DB_NAME')
         ),
         misc=Miscellaneous(
-            sentry_dsn=env.str('SENTRY_DSN')
+            sentry_dsn=env.str('SENTRY_DSN'),
+            api_user=env.str('API_USER'),
+            api_pass=env.str('API_PASS'),
+            front_url=env.str('FRONT_URL')
         )
     )
