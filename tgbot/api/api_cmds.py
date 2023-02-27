@@ -3,6 +3,7 @@ import secrets
 from aiogram import Bot, types
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from fastapi.middleware.cors import CORSMiddleware
 
 from tgbot.api.schemas import Order
 from tgbot.config import load_config
@@ -16,6 +17,14 @@ bot = Bot(token=config.tg_bot.token, parse_mode='HTML')
 async def create_app() -> FastAPI:
     app = FastAPI()
     security = HTTPBasic()
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
     async def get_current_username(credentials: HTTPBasicCredentials = Depends(security)):
         current_username_bytes = credentials.username.encode("utf8")
