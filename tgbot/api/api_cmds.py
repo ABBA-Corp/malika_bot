@@ -74,7 +74,8 @@ async def create_app() -> FastAPI:
                                     model=model, phone=phone, color=color,
                                     type=type, status=False)
             await group(order, names, bot, config)
-            return {"status": "Created"}
+            return {"status": "Created",
+                    "id": order.id}
         else:
             raise HTTPException(status_code=422, detail="Quantity files should be equal to 2")
 
