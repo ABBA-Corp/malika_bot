@@ -41,7 +41,7 @@ def register_all_handlers(dp):
 async def main():
 
     logging.basicConfig(
-        level=logging.INFO,
+        level=logging.WARNING,
         format=u'%(filename)s:%(lineno)d #%(levelname)-8s [%(asctime)s] - %(name)s - %(message)s',
     )
     config = load_config(".env")

@@ -90,14 +90,14 @@ async def get_type(c: CallbackQuery, state: FSMContext):
 
 async def get_conf(c: CallbackQuery, state: FSMContext):
     data = await state.get_data()
-    order_id = await add_order(name=data["name"], number=data["number"], passport=data["pass_id"],
-                               selfie=data["self_id"], card=data["card"], time=data["time"],
-                               model=data["model"], phone=data["phone"], color=data["color"],
-                               type=data["month"], status=False)
+    order = await add_order(name=data["name"], number=data["number"], passport=data["pass_id"],
+                            selfie=data["self_id"], card=data["card"], time=data["time"],
+                            model=data["model"], phone=data["phone"], color=data["color"],
+                            type=data["month"], status=False)
     config = c.bot.get("config")
     media = types.MediaGroup()
     media.attach_photo(data['pass_id'])
-    media.attach_photo(data['self_id'], caption=f"🆔 So'rov id: {order_id}\n"
+    media.attach_photo(data['self_id'], caption=f"🆔 So'rov id: {order.id}\n"
                                                 f"👨 Ismi: {data['name']}\n"
                                                 f"📞 Telefon raqami: {data['number']}\n"
                                                 f"💳 Karta raqami: {data['card']}\n"
@@ -105,9 +105,9 @@ async def get_conf(c: CallbackQuery, state: FSMContext):
                                                 f"📱 Model: {data['phone']}\n"
                                                 f"🎨 Rangi: {data['color']}\n"
                                                 f"📆 Muddati: {data['month']} oy\n")
-    for i in config.tg_bot.channel_ids:
-        await c.bot.send_media_group(chat_id=i, media=media)
-        await c.bot.send_message(chat_id=i, text="Tasdiqlaysizmi? 👆", reply_markup=await admin_conf_btn(order_id))
+    await c.bot.send_media_group(chat_id=config.tg_bot.channel_ids, media=media)
+    await c.bot.send_message(chat_id=config.tg_bot.channel_ids, text="Tasdiqlaysizmi? 👆",
+                             reply_markup=await admin_conf_btn(order.id))
     await c.message.delete()
     await c.message.answer("Raxmat, so'rovingiz qabul qilindi!\n"
                            "Siz bilan tez orada agentimiz bog'lanadi. 👨‍💻\n"

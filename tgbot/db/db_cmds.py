@@ -39,12 +39,12 @@ async def add_admins(admin_id, m=None, typ=True) -> bool:
             return False
 
 
-async def add_order(**kwargs) -> int:
+async def add_order(**kwargs) -> Order:
     new_order = await Order.create(name=kwargs["name"], number=kwargs["number"], passport=kwargs["passport"],
                                    selfie=kwargs["selfie"], card=kwargs["card"], time=kwargs["time"],
                                    model=kwargs["model"], phone=kwargs["phone"], color=kwargs["color"],
                                    type=kwargs["type"], status=kwargs["status"])
-    return new_order.id
+    return new_order
 
 
 async def update_order(**kwargs) -> int:

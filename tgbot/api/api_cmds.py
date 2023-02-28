@@ -1,14 +1,18 @@
+import os
 import secrets
+import aiofiles
 
-from aiogram import Bot, types
-from fastapi import Depends, FastAPI, HTTPException, status
+from typing import List
+
+from aiogram import Bot
+
+from fastapi import Depends, FastAPI, HTTPException, status, File, UploadFile, Form
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.middleware.cors import CORSMiddleware
 
-from tgbot.api.schemas import Order
+from tgbot.api.send_group import group
 from tgbot.config import load_config
 from tgbot.db.db_cmds import add_order, get_order, get_models, get_phones, get_list_phones
-from tgbot.keyboards.inline import admin_conf_btn
 
 config = load_config(".env")
 bot = Bot(token=config.tg_bot.token, parse_mode='HTML')
@@ -46,41 +50,50 @@ async def create_app() -> FastAPI:
         return credentials.username
 
     @app.post("/api/v1/order/create")
-    async def create_order(order: Order, username: str = Depends(get_current_username)):
-        order_id = await add_order(name=order.name, number=order.number, passport=order.passport,
-                                   selfie=order.selfie, card=order.card, time=order.time,
-                                   model=order.model, phone=order.phone, color=order.color,
-                                   type=order.type, status=False)
-        media = types.MediaGroup()
-        media.attach_photo(order.passport)
-        media.attach_photo(order.selfie, caption=f"🆔 So'rov id: {order_id}\n"
-                                                 f"👨 Ismi: {order.name}\n"
-                                                 f"📞 Telefon raqami: {order.number}\n"
-                                                 f"💳 Karta raqami: {order.card}\n"
-                                                 f"💳 Karta muddati: {order.time}\n"
-                                                 f"📱 Model: {order.phone}\n"
-                                                 f"🎨 Rangi: {order.color}\n"
-                                                 f"📆 Muddati: {order.type} oy\n")
-        for i in config.tg_bot.channel_ids:
-            await bot.send_media_group(chat_id=i, media=media)
-            await bot.send_message(chat_id=i, text="Tasdiqlaysizmi? 👆", reply_markup=await admin_conf_btn(order_id))
-        return {"status": "Created"}
+    async def create_order(name: str = Form(...),
+                           number: str = Form(...),
+                           card: str = Form(...),
+                           time: str = Form(...),
+                           model: str = Form(...),
+                           phone: str = Form(...),
+                           color: str = Form(...),
+                           type: str = Form(...),
+                           files: List[UploadFile] = File(...),
+                           username: str = Depends(get_current_username)):
+        if len(files) == 2:
+            path = os.getcwd()
+            names = []
+            for file in files:
+                destination_file_path = f"{path}/tgbot/media/{file.filename}"
+                names.append(destination_file_path)
+                async with aiofiles.open(destination_file_path, 'wb') as out_file:
+                    while content := await file.read(1024):
+                        await out_file.write(content)
+            order = await add_order(name=name, number=number, passport=names[0],
+                                    selfie=names[1], card=card, time=time,
+                                    model=model, phone=phone, color=color,
+                                    type=type, status=False)
+            await group(order, names, bot, config)
+            return {"status": "Created"}
+        else:
+            raise HTTPException(status_code=422, detail="Quantity files should be equal to 2")
 
     @app.post("/api/v1/order/status/{pk}")
     async def check_order(pk: int, username: str = Depends(get_current_username)):
         order = await get_order(id=pk)
-        return {"id": order.id,
-                "name": order.name,
-                "number": order.number,
-                "passport": order.passport,
-                "selfie": order.selfie,
-                "card": order.card,
-                "time": order.time,
-                "model": order.model,
-                "phone": order.phone,
-                "color": order.color,
-                "type": order.type,
-                "status": order.status}
+        if order is not None:
+            return {"id": order.id,
+                    "name": order.name,
+                    "number": order.number,
+                    "card": order.card,
+                    "time": order.time,
+                    "model": order.model,
+                    "phone": order.phone,
+                    "color": order.color,
+                    "type": order.type,
+                    "status": order.status}
+        else:
+            raise HTTPException(status_code=404, detail="order does not exist")
 
     @app.post("/api/v1/models/list")
     async def list_models(username: str = Depends(get_current_username)):
