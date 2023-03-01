@@ -37,7 +37,7 @@ async def get_pass(m: Message, state: FSMContext):
 
 async def get_self(m: Message, state: FSMContext):
     await state.update_data(self_id=m.photo[0].file_id)
-    await m.answer("Iltimos karta raqamin gizni kiriting tekshirib olishimiz uchun. 💳")
+    await m.answer("Iltimos karta raqamingizni kiriting tekshirib olishimiz uchun. 💳")
     await UserGet.next()
 
 
