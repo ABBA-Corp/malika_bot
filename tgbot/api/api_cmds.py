@@ -83,7 +83,8 @@ async def create_app() -> FastAPI:
     @app.post("/api/v1/order/file/{pk}")
     async def get_file(pk: int, username: str = Depends(get_current_username)):
         order = await get_order(id=pk)
-        if order is not None:
+        print(order)
+        if order is not None and order.file is not None:
             doc_type = order.file
             if doc_type[-3:] == "pdf":
                 file_type = ".pdf"
