@@ -57,5 +57,6 @@ class Order(db.Model):
     phone = Column(VARCHAR(500))
     color = Column(VARCHAR(500))
     type = Column(VARCHAR(500))
+    file = Column(VARCHAR(500))
     status = Column(BOOLEAN())
     date = Column(DateTime, default=datetime.datetime.utcnow())

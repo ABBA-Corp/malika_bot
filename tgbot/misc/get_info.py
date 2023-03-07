@@ -12,7 +12,6 @@ async def add_or_update_db(doc, m: Message):
     row_count = len([row for row in sheet if not all([cell.value is None for cell in row])])
     for i in range(2, row_count+1):
         if sheet[f'A{i}'].value is not None:
-            print(sheet[f'A{i}'].value)
             await add_or_update(name=str(sheet[f'B{i}'].value), model=str(sheet[f'A{i}'].value),
                                 color=str(sheet[f'C{i}'].value), month_3=str(sheet[f'D{i}'].value),
                                 month_4=str(sheet[f'E{i}'].value),

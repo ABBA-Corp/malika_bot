@@ -13,3 +13,7 @@ class UserGet(StatesGroup):
     get_color = State()
     get_type = State()
     get_conf = State()
+
+
+class GroupState(StatesGroup):
+    get_doc = State()

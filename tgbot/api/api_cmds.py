@@ -7,6 +7,7 @@ from typing import List
 from aiogram import Bot
 
 from fastapi import Depends, FastAPI, HTTPException, status, File, UploadFile, Form
+from fastapi.responses import FileResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -78,6 +79,19 @@ async def create_app() -> FastAPI:
                     "id": order.id}
         else:
             raise HTTPException(status_code=422, detail="Quantity files should be equal to 2")
+
+    @app.post("/api/v1/order/file/{pk}")
+    async def get_file(pk: int, username: str = Depends(get_current_username)):
+        order = await get_order(id=pk)
+        if order is not None:
+            doc_type = order.file
+            if doc_type[-3:] == "pdf":
+                file_type = ".pdf"
+            else:
+                file_type = ".docx"
+            return FileResponse(order.file, media_type="application/octet-stream", filename=f"{order.id}{file_type}")
+        else:
+            raise HTTPException(status_code=404, detail="order does not exist")
 
     @app.post("/api/v1/order/status/{pk}")
     async def check_order(pk: int, username: str = Depends(get_current_username)):

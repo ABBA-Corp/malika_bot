@@ -49,7 +49,10 @@ async def add_order(**kwargs) -> Order:
 
 async def update_order(**kwargs) -> int:
     order = await Order.query.where(Order.id == kwargs["id"]).gino.first()
-    await order.update(status=kwargs["status"]).apply()
+    if kwargs["file"] is None:
+        await order.update(status=kwargs["status"]).apply()
+    else:
+        await order.update(file=kwargs["file"]).apply()
     return order.id
 
 
