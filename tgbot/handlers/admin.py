@@ -70,6 +70,6 @@ def register_admin(dp: Dispatcher):
                                 state="*", is_admin=True)
     dp.register_message_handler(get_doc_group,
                                 chat_type=[types.ChatType.GROUP, types.ChatType.CHANNEL, types.ChatType.SUPERGROUP],
-                                content_types=types.ContentType.DOCUMENT, state="*")
+                                content_types=types.ContentType.DOCUMENT, state=GroupState.get_doc)
     dp.register_callback_query_handler(get_conf, chat_type=[types.ChatType.GROUP, types.ChatType.CHANNEL,
-                                                            types.ChatType.SUPERGROUP], state=GroupState.get_doc)
+                                                            types.ChatType.SUPERGROUP], state="*")
