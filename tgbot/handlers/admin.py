@@ -2,7 +2,8 @@ from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, CallbackQuery, InputFile
 
-from tgbot.db.db_cmds import add_admins, update_order
+from tgbot.db.db_cmds import add_admins
+from tgbot.db.db_api import update_order
 from tgbot.misc.get_info import add_or_update_db
 from tgbot.misc.states import GroupState
 
@@ -34,7 +35,7 @@ async def get_conf(c: CallbackQuery, state: FSMContext):
     config = c.bot.get("config")
     if c.data.startswith('co'):
         order_id = str(c.data).replace("co", "")
-        await update_order(id=int(order_id), status=True, file=None)
+        await update_order(order_id=int(order_id), status=True, file=None)
         await state.update_data(order_id=order_id)
         await c.message.edit_text(f"🆔 So'rov id: {order_id}\n"
                                   f"✅ Qabul qilindi\n"
@@ -57,7 +58,7 @@ async def get_doc_group(m: Message, state: FSMContext):
         file_type = ".docx"
     file_dest = f"tgbot/files/documents/{data['order_id']}{file_type}"
     await m.document.download(destination_file=file_dest)
-    await update_order(id=int(data['order_id']), file=file_dest)
+    await update_order(order_id=int(data['order_id']), file=file_dest)
     await m.answer(config.misc.front_url + str(data['order_id']))
 
 

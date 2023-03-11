@@ -1,32 +1,33 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from tgbot.db.db_cmds import get_models, get_phones, get_params
+# from tgbot.db.db_cmds import get_models, get_phones, get_params
+from tgbot.db.db_api import get_models, get_phones
 
 
 async def model_btns():
     model_btn = InlineKeyboardMarkup(row_width=1)
     res = await get_models()
     for i in res:
-        model_btn.add(InlineKeyboardButton(i.model, callback_data=i.model))
+        model_btn.add(InlineKeyboardButton(i["model"], callback_data=i["model"]))
     return model_btn
 
 
 async def phone_btns(model):
     phone_btn = InlineKeyboardMarkup(row_width=1)
-    res = await get_phones(model)
+    res = await get_phones(model=model)
     for i in res:
-        phone_btn.add(InlineKeyboardButton(i.name, callback_data=i.name))
+        phone_btn.add(InlineKeyboardButton(i["name"], callback_data=i["name"]))
     phone_btn.add(InlineKeyboardButton("Orqaga 🔙", callback_data="back"))
     return phone_btn
 
 
 async def params_btns(name, s):
     param_btn = InlineKeyboardMarkup(row_width=1)
-    res = await get_params(name)
-    arr = res.color.split(', ')
-    await s.update_data(month_3=round(float(res.month_3)), month_4=round(float(res.month_4)),
-                        month_6=round(float(res.month_6)), month_8=round(float(res.month_8)),
-                        month_12=round(float(res.month_12)), min=round(float(res.minimum)))
+    res = await get_phones(name=name)
+    arr = res[0]["color"].split(', ')
+    await s.update_data(month_3=round(float(res[0]["month_3"])), month_4=round(float(res[0]["month_4"])),
+                        month_6=round(float(res[0]["month_6"])), month_8=round(float(res[0]["month_8"])),
+                        month_12=round(float(res[0]["month_12"])), min=round(float(res[0]["minimum"])))
     for d in arr:
         param_btn.add(InlineKeyboardButton(d, callback_data=d))
     param_btn.add(InlineKeyboardButton("Orqaga 🔙", callback_data="back"))

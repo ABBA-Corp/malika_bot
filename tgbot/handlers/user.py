@@ -2,7 +2,7 @@ from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, CallbackQuery, InputFile
 
-from tgbot.db.db_cmds import add_order
+from tgbot.db.db_api import add_order
 from tgbot.filters.back import BackFilter
 from tgbot.keyboards.inline import model_btns, phone_btns, params_btns, month_btn, conf_btn, admin_conf_btn
 from tgbot.keyboards.reply import contact_btn, remove_btn
@@ -30,13 +30,15 @@ async def get_number(m: Message, state: FSMContext):
 
 
 async def get_pass(m: Message, state: FSMContext):
-    await state.update_data(pass_id=m.photo[0].file_id)
+    mess = await m.photo[-1].download(destination_dir="media")
+    await state.update_data(passport=mess.name)
     await m.answer("Iltimos passportingiz bn selfi qilib tashlang 🤳")
     await UserGet.next()
 
 
 async def get_self(m: Message, state: FSMContext):
-    await state.update_data(self_id=m.photo[0].file_id)
+    mess = await m.photo[-1].download(destination_dir="media")
+    await state.update_data(selfie=mess.name)
     await m.answer("Iltimos karta raqamingizni kiriting tekshirib olishimiz uchun. 💳")
     await UserGet.next()
 
@@ -90,24 +92,24 @@ async def get_type(c: CallbackQuery, state: FSMContext):
 
 async def get_conf(c: CallbackQuery, state: FSMContext):
     data = await state.get_data()
-    order = await add_order(name=data["name"], number=data["number"], passport=data["pass_id"],
-                            selfie=data["self_id"], card=data["card"], time=data["time"],
+    order = await add_order(name=data["name"], number=data["number"], passport=data["passport"],
+                            selfie=data["selfie"], card=data["card"], time=data["time"],
                             model=data["model"], phone=data["phone"], color=data["color"],
-                            type=data["month"], status=False)
+                            type=data["month"])
     config = c.bot.get("config")
     media = types.MediaGroup()
-    media.attach_photo(data['pass_id'])
-    media.attach_photo(data['self_id'], caption=f"🆔 So'rov id: {order.id}\n"
-                                                f"👨 Ismi: {data['name']}\n"
-                                                f"📞 Telefon raqami: {data['number']}\n"
-                                                f"💳 Karta raqami: {data['card']}\n"
-                                                f"💳 Karta muddati: {data['time']}\n"
-                                                f"📱 Model: {data['phone']}\n"
-                                                f"🎨 Rangi: {data['color']}\n"
-                                                f"📆 Muddati: {data['month']} oy\n")
+    media.attach_photo(InputFile(data['passport']))
+    media.attach_photo(InputFile(data['selfie']), caption=f"🆔 So'rov id: {order}\n"
+                                                          f"👨 Ismi: {data['name']}\n"
+                                                          f"📞 Telefon raqami: {data['number']}\n"
+                                                          f"💳 Karta raqami: {data['card']}\n"
+                                                          f"💳 Karta muddati: {data['time']}\n"
+                                                          f"📱 Model: {data['phone']}\n"
+                                                          f"🎨 Rangi: {data['color']}\n"
+                                                          f"📆 Muddati: {data['month']} oy\n")
     await c.bot.send_media_group(chat_id=config.tg_bot.channel_ids, media=media)
     await c.bot.send_message(chat_id=config.tg_bot.channel_ids, text="Tasdiqlaysizmi? 👆",
-                             reply_markup=await admin_conf_btn(order.id))
+                             reply_markup=await admin_conf_btn(order))
     await c.message.delete()
     await c.message.answer("Raxmat, so'rovingiz qabul qilindi!\n"
                            "Siz bilan tez orada agentimiz bog'lanadi. 👨‍💻\n"
