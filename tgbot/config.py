@@ -25,6 +25,7 @@ class Miscellaneous:
     api_user: str
     api_pass: str
     front_url: str
+    api_url: str
 
 
 @dataclass
@@ -55,6 +56,7 @@ def load_config(path: str = None):
             sentry_dsn=env.str('SENTRY_DSN'),
             api_user=env.str('API_USER'),
             api_pass=env.str('API_PASS'),
-            front_url=env.str('FRONT_URL')
+            front_url=env.str('FRONT_URL'),
+            api_url=env.str('API_URL')
         )
     )

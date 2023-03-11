@@ -71,3 +71,4 @@ async def add_or_update(**kwargs) -> None:
         await Phone.create(name=kwargs["name"], model=kwargs["model"], color=kwargs["color"],
                            month_3=kwargs["month_3"], month_4=kwargs["month_4"], month_6=kwargs["month_6"],
                            month_8=kwargs["month_8"], month_12=kwargs["month_12"], minimum=kwargs["minimum"])
+

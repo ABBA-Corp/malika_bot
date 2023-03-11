@@ -4,16 +4,17 @@ from aiogram.types import InputFile
 from tgbot.keyboards.inline import admin_conf_btn
 
 
-async def group(order, names, bot, config):
+async def group(bot, config, **kwargs):
     media = types.MediaGroup()
-    media.attach_photo(InputFile(names[0]))
-    media.attach_photo(InputFile(names[1]), caption=f"🆔 So'rov id: {order.id}\n"
-                                                    f"👨 Ismi: {order.name}\n"
-                                                    f"📞 Telefon raqami: {order.number}\n"
-                                                    f"💳 Karta raqami: {order.card}\n"
-                                                    f"💳 Karta muddati: {order.time}\n"
-                                                    f"📱 Model: {order.phone}\n"
-                                                    f"🎨 Rangi: {order.color}\n"
-                                                    f"📆 Muddati: {order.type} oy\n")
+    media.attach_photo("https://i.ibb.co/8DXZFt6/IMG-20230225-210104-766.jpg")
+    media.attach_photo("https://i.ibb.co/8DXZFt6/IMG-20230225-210104-766.jpg", caption=f"🆔 So'rov id: {kwargs['id']}\n"
+                                                    f"👨 Ismi: {kwargs['name']}\n"
+                                                    f"📞 Telefon raqami: {kwargs['number']}\n"
+                                                    f"💳 Karta raqami: {kwargs['card']}\n"
+                                                    f"💳 Karta muddati: {kwargs['time']}\n"
+                                                    f"📱 Model: {kwargs['phone']}\n"
+                                                    f"🎨 Rangi: {kwargs['color']}\n"
+                                                    f"📆 Muddati: {kwargs['type']} oy\n")
     await bot.send_media_group(chat_id=config.tg_bot.channel_ids, media=media)
-    await bot.send_message(chat_id=config.tg_bot.channel_ids, text="Tasdiqlaysizmi? 👆", reply_markup=await admin_conf_btn(order.id))
+    await bot.send_message(chat_id=config.tg_bot.channel_ids, text="Tasdiqlaysizmi? 👆",
+                           reply_markup=await admin_conf_btn(kwargs['id']))

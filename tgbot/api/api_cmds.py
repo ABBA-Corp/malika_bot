@@ -51,34 +51,35 @@ async def create_app() -> FastAPI:
         return credentials.username
 
     @app.post("/api/v1/order/create")
-    async def create_order(name: str = Form(...),
+    async def create_order(id: int = Form(...),
+                           name: str = Form(...),
                            number: str = Form(...),
                            card: str = Form(...),
                            time: str = Form(...),
                            model: str = Form(...),
                            phone: str = Form(...),
                            color: str = Form(...),
+                           passport: str = Form(...),
+                           selfie: str = Form(...),
                            type: str = Form(...),
-                           files: List[UploadFile] = File(...),
-                           username: str = Depends(get_current_username)):
-        if len(files) == 2:
-            path = os.getcwd()
-            names = []
-            for file in files:
-                destination_file_path = f"{path}/tgbot/media/{file.filename}"
-                names.append(destination_file_path)
-                async with aiofiles.open(destination_file_path, 'wb') as out_file:
-                    while content := await file.read(1024):
-                        await out_file.write(content)
-            order = await add_order(name=name, number=number, passport=names[0],
-                                    selfie=names[1], card=card, time=time,
-                                    model=model, phone=phone, color=color,
-                                    type=type, status=False)
-            await group(order, names, bot, config)
-            return {"status": "Created",
-                    "id": order.id}
-        else:
-            raise HTTPException(status_code=422, detail="Quantity files should be equal to 2")
+                           ):
+        # if len(files) == 2:
+        #     path = os.getcwd()
+        #     names = []
+        #     for file in files:
+        #         destination_file_path = f"{path}/tgbot/media/{file.filename}"
+        #         names.append(destination_file_path)
+        #         async with aiofiles.open(destination_file_path, 'wb') as out_file:
+        #             while content := await file.read(1024):
+        #                 await out_file.write(content)
+        # order = await add_order(name=name, number=number, passport=names[0],
+        #                         selfie=names[1], card=card, time=time,
+        #                         model=model, phone=phone, color=color,
+        #                         type=type, status=False)
+
+        await group(bot, config, id=id, name=name, number=number, card=card, time=time, model=model, phone=phone,
+                    color=color, passport=passport, selfie=selfie, type=type)
+        return {"status": "Created"}
 
     @app.post("/api/v1/order/file/{pk}")
     async def get_file(pk: int, username: str = Depends(get_current_username)):
