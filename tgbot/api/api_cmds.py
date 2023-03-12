@@ -50,6 +50,12 @@ async def create_app() -> FastAPI:
             )
         return credentials.username
 
+    @app.get("/api/v1/confirm")
+    async def user_confirm(order_id: int):
+        await bot.send_message(chat_id=config.tg_bot.channel_ids, text=f"🆔 Sorov id: {order_id}\n"
+                                                                       "✅ Foudalanuvchi tominidan qabul qilindi!")
+        return {"Status": "accept"}
+
     @app.post("/api/v1/order/create")
     async def create_order(id: int = Form(...),
                            name: str = Form(...),
@@ -156,3 +162,4 @@ async def create_app() -> FastAPI:
                                   "date": i.date})
         return res
     return app
+
