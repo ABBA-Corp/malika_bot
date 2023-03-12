@@ -6,8 +6,8 @@ from tgbot.keyboards.inline import admin_conf_btn
 
 async def group(bot, config, **kwargs):
     media = types.MediaGroup()
-    media.attach_photo("https://i.ibb.co/8DXZFt6/IMG-20230225-210104-766.jpg")
-    media.attach_photo("https://i.ibb.co/8DXZFt6/IMG-20230225-210104-766.jpg", caption=f"🆔 So'rov id: {kwargs['id']}\n"
+    media.attach_photo(f"https://malikabackapi.itlink.uz/{kwargs['passport']}")
+    media.attach_photo(f"https://malikabackapi.itlink.uz/{kwargs['selfie']}", caption=f"🆔 So'rov id: {kwargs['id']}\n"
                                                     f"👨 Ismi: {kwargs['name']}\n"
                                                     f"📞 Telefon raqami: {kwargs['number']}\n"
                                                     f"💳 Karta raqami: {kwargs['card']}\n"
