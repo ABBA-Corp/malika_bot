@@ -38,6 +38,12 @@ async def get_models(name=None):
                 return await response.json()
 
 
+async def get_order(order_id):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url=f"{load_config().misc.api_url}order/status/{order_id}") as response:
+            return await response.json()
+
+
 async def get_phones(model='default', name='default'):
     async with aiohttp.ClientSession() as session:
         async with session.get(url=f"{load_config().misc.api_url}phones/filter", params={"model": model,
